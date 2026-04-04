@@ -1,0 +1,33 @@
+//! 区块链预言机 - 链下数据上链适配器
+use std::collections::HashMap;
+
+pub struct Oracle {
+    data_feeds: HashMap<String, String>,
+    requesters: Vec<String>,
+}
+
+impl Oracle {
+    pub fn new() -> Self {
+        Self { data_feeds: HashMap::new(), requesters: Vec::new() }
+    }
+
+    pub fn request_data(&mut self, requester: String, key: String) {
+        self.requesters.push(requester);
+        self.data_feeds.insert(key, "Pending".into());
+    }
+
+    pub fn submit_data(&mut self, key: String, value: String) {
+        self.data_feeds.insert(key, value);
+    }
+
+    pub fn get_data(&self, key: &str) -> Option<&String> {
+        self.data_feeds.get(key)
+    }
+}
+
+fn main() {
+    let mut oracle = Oracle::new();
+    oracle.request_data("Contract1".into(), "BTC/USD".into());
+    oracle.submit_data("BTC/USD".into(), "50000".into());
+    println!("Price: {:?}", oracle.get_data("BTC/USD"));
+}
